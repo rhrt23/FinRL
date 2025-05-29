@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-SINGLE_TICKER = ["AAPL"]
+SINGLE_TICKER_APPLE = ["AAPL"]
+SINGLE_TICKER = ["^IXIC"]
+
 
 # Dow 30 constituents in 2021/10
 # check https://wrds-www.wharton.upenn.edu/ for U.S. index constituents
