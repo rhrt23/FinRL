@@ -4,13 +4,26 @@ from finrl.config import ERL_PARAMS
 from finrl.config import INDICATORS
 from finrl.config import RLlib_PARAMS
 from finrl.config import SAC_PARAMS
-from finrl.config import TRAIN_END_DATE
-from finrl.config import TRAIN_START_DATE
+from finrl.config import TRAIN_START_DATE, TRAIN_END_DATE, TEST_START_DATE, TEST_END_DATE
 from finrl.config_tickers import DOW_30_TICKER, SINGLE_TICKER
 from finrl.meta.data_processor import DataProcessor
 from finrl.meta.env_stock_trading.env_stocktrading_np import StockTradingEnv
-
+import yfinance as yf
 # construct environment
+
+def data_process(start_date, end_date, ticker):
+    nasdaq_df_yf = yf.download(ticker, start_date, end_date)
+    print(nasdaq_df_yf.head())
+
+    # Compute split index
+    train_ratio = 0.7
+    split_index = int(len(nasdaq_df_yf) * train_ratio)
+    
+    # Split the data
+    train_df = nasdaq_df_yf.iloc[:split_index]
+    test_df = nasdaq_df_yf.iloc[split_index:]
+    print(len(train_df))
+    print(len(test_df))
 
 
 def train(
@@ -107,21 +120,27 @@ if __name__ == "__main__":
     kwargs = (
         {}
     )  # in current meta, with respect yahoofinance, kwargs is {}. For other data sources, such as joinquant, kwargs is not empty
-    train(
+    
+    data_process(
         start_date=TRAIN_START_DATE,
-        end_date=TRAIN_END_DATE,
-        ticker_list=SINGLE_TICKER,
-        data_source="yahoofinance",
-        time_interval="1D",
-        technical_indicator_list=INDICATORS,
-        drl_lib="elegantrl",
-        env=env,
-        model_name="ppo",
-        cwd="./test_ppo",
-        erl_params=ERL_PARAMS,
-        break_step=1e5,
-        kwargs=kwargs,
-    )
+        end_date=TEST_END_DATE, 
+        ticker='^IXIC')
+    
+    # train(
+    #     start_date=TRAIN_START_DATE,
+    #     end_date=TRAIN_END_DATE,
+    #     ticker_list=SINGLE_TICKER,
+    #     data_source="yahoofinance",
+    #     time_interval="1D",
+    #     technical_indicator_list=INDICATORS,
+    #     drl_lib="elegantrl",
+    #     env=env,
+    #     model_name="ppo",
+    #     cwd="./test_ppo",
+    #     erl_params=ERL_PARAMS,
+    #     break_step=1e5,
+    #     kwargs=kwargs,
+    # )
 
     ## if users want to use rllib, or stable-baselines3, users can remove the following comments
 
